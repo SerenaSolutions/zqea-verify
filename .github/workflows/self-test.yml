@@ -1,0 +1,28 @@
+name: self-test
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify sealed receipt
+        uses: ./
+        id: ok
+        with:
+          receipt-file: examples/s3_qutrit_final_receipt.json
+      - name: Show status
+        run: echo "status=${{ steps.ok.outputs.status }} seal=${{ steps.ok.outputs.seal }}"
+      - name: Tamper and expect failure
+        run: |
+          python3 - <<'EOF'
+          import json
+          r=json.load(open('examples/s3_qutrit_final_receipt.json'))
+          r['data']=str(r.get('data','x'))+'tampered'
+          json.dump(r,open('/tmp/tampered.json','w'))
+          EOF
+          set +e
+          python3 zqea_verify.py /tmp/tampered.json
+          code=$?
+          set -e
+          if [ $code -ne 1 ]; then echo "TAMPERED RECEIPT PASSED — verifier broken"; exit 1; fi
+          echo "tampered receipt correctly BROKEN (exit $code)"
