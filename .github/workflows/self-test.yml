@@ -14,6 +14,7 @@ jobs:
         run: echo "status=${{ steps.ok.outputs.status }} seal=${{ steps.ok.outputs.seal }}"
       - name: Tamper and expect failure
         run: |
+          pip install --quiet pqcrypto
           python3 - <<'EOF'
           import json
           r=json.load(open('examples/s3_qutrit_final_receipt.json'))
@@ -26,3 +27,26 @@ jobs:
           set -e
           if [ $code -ne 1 ]; then echo "TAMPERED RECEIPT PASSED — verifier broken"; exit 1; fi
           echo "tampered receipt correctly BROKEN (exit $code)"
+
+  pq:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Post-quantum battery (ML-DSA-44)
+        run: |
+          pip install --quiet pqcrypto
+          python3 - <<'EOF2'
+          import json, base64
+          from zqea_pq import sign_receipt, verify_signature, sha3_seal, quantum_receipt_id, entropy_provenance
+          rec = {"artefato": "pq-battery", "valor": 42}
+          rec["recibo_id"] = quantum_receipt_id("ci")
+          rec["entropia_quantica"] = entropy_provenance()
+          rec = sign_receipt(rec)
+          rec["selo_sha3_256"] = sha3_seal({k: v for k, v in rec.items() if k != "selo_sha3_256"})
+          s, d = verify_signature(rec); assert s == "PQ_OK", (s, d)
+          rec["valor"] = 43
+          s, d = verify_signature(rec); assert s == "PQ_INVALID", (s, d)
+          v1 = {"old": True}; v1["selo_sha3_256"] = sha3_seal(v1)
+          s, d = verify_signature(v1); assert s == "LEGACY_V1", (s, d)
+          print("PQ battery: sign VALID, tamper INVALID, v1 LEGACY — ALL PASS")
+          EOF2

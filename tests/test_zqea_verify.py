@@ -22,3 +22,20 @@ def test_tampered_receipt_broken():
     r["data"] = str(r.get("data", "x")) + "tampered"
     ok, _, why = _ns()["verify"](r)
     assert not ok, ("tampered receipt must break", why)
+
+
+def test_post_quantum_signature_roundtrip():
+    ns = _ns()
+    from zqea_pq import sign_receipt, verify_signature, sha3_seal
+    rec = {"bateria": "pq", "valor": 7}
+    rec = sign_receipt(rec)
+    rec["selo_sha3_256"] = sha3_seal({k: v for k, v in rec.items() if k != "selo_sha3_256"})
+    s, d = verify_signature(rec); assert s == "PQ_OK", (s, d)
+    rec["valor"] = 8
+    s, d = verify_signature(rec); assert s == "PQ_INVALID", (s, d)
+
+def test_legacy_v1_receipt_reported_not_failed():
+    ns = _ns()
+    from zqea_pq import verify_signature, sha3_seal
+    v1 = {"legacy": True}; v1["selo_sha3_256"] = sha3_seal(v1)
+    s, d = verify_signature(v1); assert s == "LEGACY_V1", (s, d)

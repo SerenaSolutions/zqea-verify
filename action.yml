@@ -1,5 +1,5 @@
 name: 'Z-QEA Receipt Verifier'
-description: 'Verify the SHA3-256 seal of a Z-QEA receipt JSON: INTEGRAL passes the job, a broken seal fails it.'
+description: 'Verify Z-QEA receipts: SHA3-256 seal + ML-DSA-44 post-quantum signature + quantum entropy audit.'
 branding:
   icon: 'shield'
   color: 'blue'
@@ -17,6 +17,9 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: 'Install post-quantum core (ML-DSA-44)'
+      shell: bash
+      run: pip install --quiet pqcrypto
     - name: 'Verify Z-QEA receipt seal'
       id: verify
       shell: bash
