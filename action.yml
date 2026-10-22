@@ -1,5 +1,5 @@
 name: 'Z-QEA Receipt Verifier'
-description: 'Verify the SHA3-256 seal (Z-QEA) of a receipt JSON — SELO ÍNTEGRO passes the job; a broken seal fails it. Nothing executes silently.'
+description: 'Verify the SHA3-256 seal of a Z-QEA receipt JSON: INTEGRAL passes the job, a broken seal fails it.'
 branding:
   icon: 'shield'
   color: 'blue'
