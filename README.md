@@ -65,3 +65,11 @@ registry — is declared roadmap, sold only when it exists.)
 ## License
 
 MIT © 2026 Serena Solutions
+
+## Prova de conceito (hardware real)
+
+Bateria em modo estrito: 6/6 recibos válidos (selo + ML-DSA-44), fraude recusada nas duas camadas.
+
+Recibo selado: [`poc/receipt_verifier_poc.json`](poc/receipt_verifier_poc.json) — verificável com `python3 zqea_verify.py poc/receipt_verifier_poc.json --strict-pq`.
+
+Bateria completa do confronto multilíngue (OpenQASM 3, Qiskit, Cirq, PennyLane, Braket, Q#): [SerenaSolutions/quantum-poc](https://github.com/SerenaSolutions/quantum-poc).
