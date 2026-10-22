@@ -46,6 +46,20 @@ Try it now: this repository's own CI verifies a real sealed receipt from the
 [ZEPHIRUM quantum language](https://github.com/SerenaSolutions/zephirum-lang)
 (S3 qutrit fusion, IBM Heron `ibm_fez` job IDs).
 
+## Security scope — what each layer does and does not prove
+
+Declared in the house honesty style (see the external audit record in
+[zephirum-lang/docs/AUDIT.md](https://github.com/SerenaSolutions/zephirum-lang/blob/main/docs/AUDIT.md)):
+
+| Layer | Implemented | What it proves | What it does NOT prove |
+|-------|-------------|----------------|------------------------|
+| `selo_sha3_256` | yes | **Integrity**: the receipt was not edited after sealing | who sealed it |
+| `assinatura_pq` (ML-DSA-44, v2) | yes, **self-consistency only** | the receipt is internally consistent with the public key embedded in it | **identity or authorship**: the keypair is ephemeral per seal and the public key ships inside the receipt, so anyone can produce a receipt that passes |
+
+Not provided today, declared roadmap: signatures bound to a persistent identity,
+an accredited cryptographic module (CMVP) and HSM/KMS-held keys. Until then,
+treat a passing result as **tamper-evidence**, not as **attribution**.
+
 ## Pricing
 
 **Free forever.** Open source, MIT. Its job is to make sealed receipts a
@@ -68,7 +82,7 @@ MIT © 2026 Serena Solutions
 
 ## Prova de conceito (hardware real)
 
-Bateria em modo estrito: 6/6 recibos válidos (selo + ML-DSA-44), fraude recusada nas duas camadas.
+Bateria em modo estrito: 6/6 recibos válidos (selo + ML-DSA-44), fraude recusada nas duas camadas (integridade do selo e autoconsistência da assinatura; sem prova de autoria, ver "Security scope").
 
 Recibo selado: [`poc/receipt_verifier_poc.json`](poc/receipt_verifier_poc.json) — verificável com `python3 zqea_verify.py poc/receipt_verifier_poc.json --strict-pq`.
 
