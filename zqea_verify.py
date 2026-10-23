@@ -25,7 +25,40 @@ def verify(receipt):
     recomputed = hashlib.sha3_256(canonical(payload).encode()).hexdigest()
     return declared == recomputed, recomputed, "ok" if declared == recomputed else "seal mismatch"
 
+def verify_chain(paths):
+    """v2.1.0 — cadeia de proveniencia: recibo[i].previous_seal == recibo[i-1].selo."""
+    import hashlib
+    seals = []
+    for p in paths:
+        rec = json.load(open(p))
+        ok, _, _ = verify(rec)
+        if not ok:
+            return False, "selo interno ROMPIDO em %s" % p
+        seals.append(rec.get("selo_sha3_256"))
+    for i in range(1, len(paths)):
+        rec = json.load(open(paths[i]))
+        if rec.get("previous_seal") != seals[i - 1]:
+            return False, "elo quebrado em %s: previous_seal nao bate com o selo anterior" % paths[i]
+    return True, "CADEIA ÍNTEGRA (%d elos, proveniência contínua)" % len(paths)
+
+
 def main():
+    args = sys.argv[1:]
+    if not args:
+        print("usage: zqea_verify.py <receipt.json> [--strict-pq] | --chain r1.json r2.json [r3.json ...]")
+        return 2
+    if args[0] == "--chain":
+        paths = args[1:]
+        if len(paths) < 2:
+            print("Z-QEA: --chain precisa de 2+ recibos em ordem"); return 2
+        try:
+            ok, msg = verify_chain(paths)
+        except Exception as e:
+            print("Z-QEA CHAIN: ERRO —", e); return 1
+        print("cadeia de proveniência (v2.1.0):")
+        print("  ", "OK —", msg if ok else msg)
+        print("  ", "CADEIA ÍNTEGRA" if ok else "CADEIA ROMPIDA")
+        return 0 if ok else 1
     if len(sys.argv) < 2:
         print("usage: zqea_verify.py <receipt.json> [--strict-pq]")
         return 2

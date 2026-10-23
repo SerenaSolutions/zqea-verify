@@ -1,5 +1,5 @@
 name: 'Z-QEA Receipt Verifier'
-description: 'Verify Z-QEA receipts: SHA3-256 seal + ML-DSA-44 post-quantum signature + quantum entropy audit.'
+description: 'Verify Z-QEA receipts: SHA3-256 seal + ML-DSA-44 signature + quantum entropy + provenance chain audit.'
 branding:
   icon: 'shield'
   color: 'blue'
