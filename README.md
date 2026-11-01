@@ -1,6 +1,6 @@
 # Z-QEA Receipt Verifier
 
-![seal](https://img.shields.io/badge/seal-SHA3--256-blue) ![license](https://img.shields.io/badge/license-MIT-blue)
+![seal](https://img.shields.io/badge/seal-SHA3--256-blue) ![license](https://img.shields.io/badge/license-Apache--2.0-blue)
 
 **Verify the SHA3-256 seal (Z-QEA) of a receipt JSON.** `INTEGRAL` passes the job; a broken seal fails it. *Nothing executes silently.*
 
